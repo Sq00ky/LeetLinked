@@ -6,7 +6,6 @@ from time import sleep
 from random import choice
 from threading import Thread
 from bs4 import BeautifulSoup
-from progressbar import ProgressBar
 import xlwt
 requests.packages.urllib3.disable_warnings()
 USER_AGENTS = [line.strip() for line in open('user_agents.txt')]
