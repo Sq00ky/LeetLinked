@@ -51,11 +51,9 @@ optional arguments:
 
 ## Todo:
 
-```
 - [x] Implement more email formats, lastnamef, firstlast, fl, etc.
 - [ ] Implement HIBP API (WIP!)
 - [ ] Implement DeHashed API
 - [ ] Completely re-write tool so it's not based on someone elses 
-```
 
 Modified by Ronnie Bartwitz / Ronnie Bartwitz
