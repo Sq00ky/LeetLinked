@@ -7,6 +7,7 @@ from random import choice
 from threading import Thread
 from bs4 import BeautifulSoup
 import xlwt
+import xlrd
 requests.packages.urllib3.disable_warnings()
 USER_AGENTS = [line.strip() for line in open('user_agents.txt')]
 class ScrapeEngine():
@@ -110,15 +111,15 @@ def main(args):
     banner()
     if args.email_format == 1:
         print("Email format jsmith@company.xyz chosen")
-    if args.email_format == 2:
+    elif args.email_format == 2:
         print("Email format johnsmith@company.xyz chosen")
-    if args.email_format == 3:
+    elif args.email_format == 3:
         print("Email format johns@company.xyz chosen")
-    if args.email_format == 4:
+    elif args.email_format == 4:
         print("Email format smithj@company.xyz chosen")
-    if args.email_format == 5:
+    elif args.email_format == 5:
         print("Email format john.smith@company.xyz chosen")
-    if args.email_format == 6:
+    elif args.email_format == 6:
         print("Email format smith.john@company.xyz chosen")
 
     q = 1
@@ -147,19 +148,19 @@ def main(args):
                 if args.email_format == 1:
                     email = fname[0]+lname+"@"+args.email_domain
                     # jsmith first_initial last
-                if args.email_format == 2:
+                elif args.email_format == 2:
                     email = fname+lname+"@"+args.email_domain
                     # johnsmith first last
-                if args.email_format == 3:
+                elif args.email_format == 3:
                     email = fname+lname[0]+"@"+args.email_domain
                     # johns first last_initial
-                if args.email_format == 4:
+                elif args.email_format == 4:
                     email = lname+fname[0]+"@"+args.email_domain
                     # smithj
-                if args.email_format == 5:
+                elif args.email_format == 5:
                     email = fname+"."+lname+"@"+args.email_domain
                     # john.smith
-                if args.email_format == 6:
+                elif args.email_format == 6:
                     email = lname+"."+fname+"@"+args.email_domain
                     # smith.john
                 ws.write(q,3,email)
@@ -196,7 +197,7 @@ Modified by Ronnie Bartwitz
 
 
 if __name__ == '__main__':
-    VERSION = "0.2.0"
+    VERSION = "0.1.0"
     args = argparse.ArgumentParser(description="", formatter_class=argparse.RawTextHelpFormatter, usage=argparse.SUPPRESS)
     args.add_argument('-t', dest='timeout', type=int, default=25,help='Timeout [seconds] for search threads (Default: 25)')
     args.add_argument('-j', dest='jitter', type=float, default=0,help='Jitter for scraping evasion (Default: 0)')
