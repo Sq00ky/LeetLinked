@@ -108,6 +108,19 @@ def main(args):
     found_names = {}
     search = ['google', 'bing']
     banner()
+    if args.email_format == 1:
+        print("Email format jsmith@company.xyz chosen")
+    if args.email_format == 2:
+        print("Email format johnsmith@company.xyz chosen")
+    if args.email_format == 3:
+        print("Email format johns@company.xyz chosen")
+    if args.email_format == 4:
+        print("Email format smithj@company.xyz chosen")
+    if args.email_format == 5:
+        print("Email format john.smith@company.xyz chosen")
+    if args.email_format == 6:
+        print("Email format smith.john@company.xyz chosen")
+
     q = 1
     w = 2 # NOTE: Variable W is for when working within spreadsheet. Python starts at 0 and counts upwards from there. Excel starts at 1, causing there to be a downwards shift in cells within formulas.
     wb = xlwt.Workbook()
@@ -118,7 +131,10 @@ def main(args):
     ws.write(0,1, "Last Name:")
     ws.write(0,2, "Job Title:")
     ws.write(0,3, "Email:")
-    
+    #if args.hibp != "":
+    #    ws.write(0,4, "Pwned?")
+    #    ws.write(0,5,"Breaches:")
+
     for site in search:
         lkin = ScrapeEngine().search(site, args.company_name, args.timeout, args.jitter)
         if lkin:
@@ -126,7 +142,30 @@ def main(args):
                 ws.write(q,0,data['first'])
                 ws.write(q,1,data['last'])
                 ws.write(q,2,data['title'])
-                ws.write(q,3,xlwt.Formula('CONCATENATE(LEFT(A%s,1),B%s,"@%s")' % (w, w, args.company_name)))
+                fname = data['first']
+                lname = data['last']
+                if args.email_format == 1:
+                    email = fname[0]+lname+"@"+args.email_domain
+                    # jsmith first_initial last
+                if args.email_format == 2:
+                    email = fname+lname+"@"+args.email_domain
+                    # johnsmith first last
+                if args.email_format == 3:
+                    email = fname+lname[0]+"@"+args.email_domain
+                    # johns first last_initial
+                if args.email_format == 4:
+                    email = lname+fname[0]+"@"+args.email_domain
+                    # smithj
+                if args.email_format == 5:
+                    email = fname+"."+lname+"@"+args.email_domain
+                    # john.smith
+                if args.email_format == 6:
+                    email = lname+"."+fname+"@"+args.email_domain
+                    # smith.john
+                ws.write(q,3,email)
+                #if args.hibp != "":
+                #    ws.write(q,4,)
+
                 w = w + 1
                 q = q + 1
                 id = data['first'] + ":" + data['last']
@@ -148,13 +187,22 @@ def banner():
 Based off of https://github.com/m8r0wn/CrossLinked
 Modified by Ronnie Bartwitz
 """)
+#def hibpapi():
+#    hibp_url = "https://haveibeenpwned.com/api/v3/breachedaccount/"
+#    hibp_email = email
+#    hibp_request = hibp_url + hibp_email
+#    response = requests.get("hibp_request")
+
+
 if __name__ == '__main__':
-    VERSION = "0.1.0"
+    VERSION = "0.2.0"
     args = argparse.ArgumentParser(description="", formatter_class=argparse.RawTextHelpFormatter, usage=argparse.SUPPRESS)
     args.add_argument('-t', dest='timeout', type=int, default=25,help='Timeout [seconds] for search threads (Default: 25)')
     args.add_argument('-j', dest='jitter', type=float, default=0,help='Jitter for scraping evasion (Default: 0)')
-    args.add_argument('-f', dest='nformat', type=str, required=True, help='Format names, ex: \'domain\{f}{last}\', \'{first}.{last}@domain.com\'')
     args.add_argument('-s', "--safe", dest="safe", action='store_true',help="Only parse names with company in title (Reduces false positives)")
+    args.add_argument('-e', "--email-domain", required=True, dest="email_domain", help="Include the email domain for email-generation (Example: microsoft.com) ")
+    args.add_argument('-p', "--hibp", type=str, required=False, dest="hibp", default="", help="Runs all of the emails through HaveIBeenPwned's API and will list pwned accounts, API key is a required argument.")
+    args.add_argument('-f', "--email-format", dest="email_format", required=True,type=int,default=1, help="Generates emails based on various formats, 1=jsmith 2=johnsmith 3=johns 4=smithj 5=john.smith 6=smith.john")
     args.add_argument(dest='company_name', nargs='+', help='Target company name')
     args = args.parse_args()
     safe = args.safe
