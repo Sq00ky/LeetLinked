@@ -172,6 +172,7 @@ def main(args):
                 if name and id not in found_names:
                     found_names[id] = data
         wb.save(compname)
+    print("Scrape Complete!")
 def banner():
     print("""
 
