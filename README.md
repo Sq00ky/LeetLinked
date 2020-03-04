@@ -58,4 +58,4 @@ optional arguments:
 - [ ] Implement DeHashed API
 - [ ] Completely re-write tool so it's not based on someone elses 
 
-Modified by Ronnie Bartwitz / Ronnie Bartwitz
+Modified by Ronnie Bartwitz / Ronald Bartwitz
