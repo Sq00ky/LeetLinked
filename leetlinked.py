@@ -7,7 +7,6 @@ from random import choice
 from threading import Thread
 from bs4 import BeautifulSoup
 import xlwt
-import xlrd
 requests.packages.urllib3.disable_warnings()
 USER_AGENTS = [line.strip() for line in open('user_agents.txt')]
 class ScrapeEngine():
