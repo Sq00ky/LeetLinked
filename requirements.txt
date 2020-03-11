@@ -3,4 +3,5 @@ unidecode
 requests
 argparse
 xlwt
+xlrd
 json
