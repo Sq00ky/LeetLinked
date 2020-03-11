@@ -53,9 +53,9 @@ optional arguments:
 
 ## Todo:
 
-- [x] Implement more email formats, lastnamef, firstlast, fl, etc.
-- [ ] Implement HIBP API (WIP!)
-- [ ] Implement DeHashed API
-- [ ] Completely re-write tool so it's not based on someone elses 
+- [x] Implement more email formats, lastnamef, firstlast, fl, etc. (Pls create issues to request more)
+- [x] Implement HIBP API - Finished
+- [ ] Implement DeHashed API - (It's going to cost a fair bit of money to do this because dehash costs $ per query...)
+- [ ] Completely re-write tool so it's not based on someone elses
 
-Modified by Ronnie Bartwitz / Ronald Bartwitz
+Modified by Ronnie Bartwitz / Ronald Bartwitz // @Horshark
