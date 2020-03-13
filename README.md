@@ -48,7 +48,7 @@ optional arguments:
                         Include the email domain for email-generation (Example: microsoft.com)
   -p HIBP, --hibp HIBP  Runs all of the emails through HaveIBeenPwned's API and will list pwned accounts, API key is a required argument.
   -f EMAIL_FORMAT, --email-format EMAIL_FORMAT
-                        Generates emails based on various formats, 1=jsmith 2=johnsmith 3=johns 4=smithj 5=john.smith 6=smith.john
+                        Generates emails based on various formats, 1=jsmith 2=johnsmith 3=johns 4=smithj 5=john.smith 6=smith.john 7=smith
 ```
 
 ## Todo:
