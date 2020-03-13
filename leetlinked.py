@@ -342,7 +342,7 @@ Modified by Ronnie Bartwitz and @Horshark on Github
 """)
 
 if __name__ == '__main__':
-    VERSION = "0.1.0"
+    VERSION = "1.0"
     args = argparse.ArgumentParser(description="", formatter_class=argparse.RawTextHelpFormatter, usage=argparse.SUPPRESS)
     args.add_argument('-t', dest='timeout', type=int, default=25,help='Timeout [seconds] for search threads (Default: 25)')
     args.add_argument('-j', dest='jitter', type=float, default=0,help='Jitter for scraping evasion (Default: 0)')
