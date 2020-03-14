@@ -1,18 +1,35 @@
 #!/usr/bin/env python3
-import argparse
-import requests
+import argparse, requests
+import xlwt, xlrd, json
+
 from sys import exit
 from time import sleep
 from random import choice
 from threading import Thread
 from bs4 import BeautifulSoup
-import xlwt
-import xlrd
-import json
 
 requests.packages.urllib3.disable_warnings()
 USER_AGENTS = [line.strip() for line in open('user_agents.txt')]
 
+# Printing the banner.
+def banner():
+    print("""
+
+ /$$                             /$$     /$$       /$$           /$$                       /$$
+| $$                            | $$    | $$      |__/          | $$                      | $$
+| $$        /$$$$$$   /$$$$$$  /$$$$$$  | $$       /$$ /$$$$$$$ | $$   /$$  /$$$$$$   /$$$$$$$
+| $$       /$$__  $$ /$$__  $$|_  $$_/  | $$      | $$| $$__  $$| $$  /$$/ /$$__  $$ /$$__  $$
+| $$      | $$$$$$$$| $$$$$$$$  | $$    | $$      | $$| $$  \ $$| $$$$$$/ | $$$$$$$$| $$  | $$
+| $$      | $$_____/| $$_____/  | $$ /$$| $$      | $$| $$  | $$| $$_  $$ | $$_____/| $$  | $$
+| $$$$$$$$|  $$$$$$$|  $$$$$$$  |  $$$$/| $$$$$$$$| $$| $$  | $$| $$ \  $$|  $$$$$$$|  $$$$$$$
+|________/ \_______/ \_______/   \___/  |________/|__/|__/  |__/|__/  \__/ \_______/ \_______/
+                                                                                              
+Based off of https://github.com/m8r0wn/CrossLinked
+Modified by Ronnie Bartwitz and @Horshark on Github
+""")
+
+
+# ScrapeEngine for google and bing.
 class ScrapeEngine():
     URL = {'google': 'https://www.google.com/search?q=site:linkedin.com/in+"{}"&num=100&start={}',
            'bing': 'https://www.bing.com/search?q=site:linkedin.com/in+"{}"&first={}'}
@@ -26,11 +43,19 @@ class ScrapeEngine():
         self.running = False
 
     def search(self, search_engine, company_name, timeout, jitter):
-        self.running = True  # Define search as "running" after init(), not used in DNS_Enum
-        Thread(target=self.timer, args=(timeout,), daemon=True).start()  # Start timeout thread
-        self.search_links = 0  # Total Links found by search engine
-        self.name_count = 0  # Total names found from linkedin
-        found_names = 0  # Local count to detect when no new names are found
+        # Define search as "running" after init(), not used in DNS_Enum
+        self.running = True
+        
+        # Start timeout thread
+        Thread(target=self.timer, args=(timeout,), daemon=True).start()
+
+        # Total Links found by search engine
+        self.search_links = 0 
+        # Total names found from linkedin
+        self.name_count = 0 
+
+        # Local count to detect when no new names are found
+        found_names = 0
 
         while self.running:
             if self.search_links > 0 and found_names == self.name_count:
@@ -107,6 +132,7 @@ class ScrapeEngine():
         return False
 
 
+# Requests and links.
 def get_links(raw_response):
     # Returns a list of links from raw requests input
     links = []
@@ -117,7 +143,6 @@ def get_links(raw_response):
         except:
             pass
     return links
-
 
 def get_request(link, timeout):
     # HTTP(S) GET request w/ user defined timeout
@@ -136,6 +161,8 @@ def main(args):
     found_names = {}
     search = ['google', 'bing']
     banner()
+
+    # Sets the email format.
     if args.email_format == 1:
         print("Email format jsmith@company.xyz chosen")
     elif args.email_format == 2:
@@ -149,6 +176,7 @@ def main(args):
     elif args.email_format == 6:
         print("Email format smith.john@company.xyz chosen")
 
+    # Sheet's variables.
     q = 1
     w = 2 # NOTE: Variable W is for when working within spreadsheet. Python starts at 0 and counts upwards from there. Excel starts at 1, causing there to be a downwards shift in cells within formulas.
     wb = xlwt.Workbook()
@@ -156,6 +184,7 @@ def main(args):
     compname = args.company_name
     compname = compname[:-4] + "Scraped.xls"
 
+    ## Column vars.
     col_offset = 10
     col_fname = 0
     col_lname = 1
@@ -165,6 +194,7 @@ def main(args):
     col_breaches = 5
     col_passwords = 6
 
+    # Names.
     f_name = "First Name:"
     l_name = "Last Name:"
     job_name = "Job Title:"
@@ -174,6 +204,7 @@ def main(args):
     breaches_name = "Breaches:"
     passwords_name = "Passwords Breached:"
 
+    # Write the name of the columns.
     ws.write(0, col_fname, f_name)
     ws.write(0, col_lname, l_name)
     ws.write(0, col_job, job_name)
@@ -184,6 +215,7 @@ def main(args):
         ws.write(0, col_breaches, breaches_name)
         ws.write(0, col_passwords, passwords_name)
 
+    # Width of each column, for later adjustment.
     f_size = len(f_name)
     l_size = len(l_name)
     job_size = len(job_name)
@@ -192,37 +224,31 @@ def main(args):
     breaches_size = len(breaches_name)
     passwords_size = len(passwords_name)
 
+
+    # Main loop.
     for site in search:
 
+        # Start the scrape engine.
         lkin = ScrapeEngine().search(site, args.company_name, args.timeout, args.jitter)
 
         if lkin:
+            # Makes requests.
             breaches_pass = []
             hibp_url = "https://haveibeenpwned.com/api/v3/breaches"
             response = requests.get(hibp_url, headers={'hibp-api-key':args.hibp})
             response_json = json.loads(response.content)
 
+            # Add every breach that contains password exposition to a list.
             for breach in response_json:
                 if "Passwords" in breach["DataClasses"]:
                     breaches_pass.append(breach["Name"])
 
+            # For each person..
             for name, data in lkin.items():
-                 
+                # Get his names, job and email.
                 fname = data['first']
                 lname = data['last']
                 job = data['title']
-
-                if len(fname) > f_size:
-                    f_size = len(fname)
-                if len(lname) > f_size:
-                    l_size = len(lname)
-                if len(job) > job_size:
-                    job_size = len(job)
-                
-                ws.write(q, col_fname, fname)
-                ws.write(q, col_lname, lname)
-                ws.write(q, col_job, job)
-
 
                 if args.email_format == 1:
                     email = fname[0]+lname+"@"+args.email_domain
@@ -246,27 +272,41 @@ def main(args):
                     email = lname+"@"+args.email_domain
                     #smith
 
+                # Writes the person's info.
+                ws.write(q, col_fname, fname)
+                ws.write(q, col_lname, lname)
+                ws.write(q, col_job, job)
+                ws.write(q, col_email, email)
 
+                # Check for the longest width.
+                if len(fname) > f_size:
+                    f_size = len(fname)
+                if len(lname) > f_size:
+                    l_size = len(lname)
+                if len(job) > job_size:
+                    job_size = len(job)
                 if len(email) > email_size:
                     email_size = len(email)
 
-                ws.write(q, col_email, email)
-
-
+                # If Have I Been Pwned option is on.
                 if args.hibp != "":
+                    # Requests the URL.
                     hibp_url = "https://haveibeenpwned.com/api/v3/breachedaccount/"
                     hibp_email = email
                     hibp_request = hibp_url + hibp_email
 
+                    # The API doesn't like getting spammed.
                     sleep(1.5)
 
                     response = requests.get(hibp_request, headers={'hibp-api-key':args.hibp})
-
                     response_code = response.status_code
 
+                    # Prints the result to each email.
                     print(response_code,email)
 
+                    # If the response is positive..
                     if response_code == 200:
+                        # Writes pwned col to yes.
                         ws.write(q, col_pwned, "Y")
 
                         response_json = json.loads(response.content)
@@ -276,6 +316,7 @@ def main(args):
 
                         breached_n = len(response_json)
 
+                        # Adds every breach name to a list.
                         for i in range(0, breached_n):
                             breach = response_json[i]["Name"]
 
@@ -284,15 +325,14 @@ def main(args):
                             if i != breached_n-1:
                                 breaches_string += ", "
 
-                            # If breach contains passwords, adds it to pass_breach list.
+                            # If breach contains passwords leak, adds it to pass_breach list.
                             if breach in breaches_pass:
-
                                 if len(passwords_string) != 0:
                                     passwords_string += " - "
 
                                 passwords_string += breach
 
-
+                        # Checks for the longest width.
                         if len(breaches_string) > breaches_size:
                             breaches_size = len(breaches_string)
                         if len(passwords_string) > passwords_size:
@@ -303,8 +343,9 @@ def main(args):
                         ws.write(q, col_breaches, breaches_string)
                         ws.write(q, col_passwords, passwords_string)
 
-
+                    # Otherwise..
                     else:
+                        # Writes no to pwned col.
                         ws.write(q, col_pwned, "N")
 
                 w = w + 1
@@ -315,6 +356,7 @@ def main(args):
                 if name and id not in found_names:
                     found_names[id] = data
 
+        # Finally, sets the coiums width to their maximum.
         ws.col(col_fname).width = 257 * f_size + col_offset
         ws.col(col_lname).width = 257 * l_size + col_offset
         ws.col(col_job).width = 257 * job_size + col_offset
@@ -323,38 +365,29 @@ def main(args):
         ws.col(col_breaches).width = 257 * breaches_size + col_offset
         ws.col(col_passwords).width = 257 * passwords_size + col_offset
 
+        # Write to the actual file.
         wb.save(compname)
     print("Scrape Complete!")
-def banner():
-    print("""
-
- /$$                             /$$     /$$       /$$           /$$                       /$$
-| $$                            | $$    | $$      |__/          | $$                      | $$
-| $$        /$$$$$$   /$$$$$$  /$$$$$$  | $$       /$$ /$$$$$$$ | $$   /$$  /$$$$$$   /$$$$$$$
-| $$       /$$__  $$ /$$__  $$|_  $$_/  | $$      | $$| $$__  $$| $$  /$$/ /$$__  $$ /$$__  $$
-| $$      | $$$$$$$$| $$$$$$$$  | $$    | $$      | $$| $$  \ $$| $$$$$$/ | $$$$$$$$| $$  | $$
-| $$      | $$_____/| $$_____/  | $$ /$$| $$      | $$| $$  | $$| $$_  $$ | $$_____/| $$  | $$
-| $$$$$$$$|  $$$$$$$|  $$$$$$$  |  $$$$/| $$$$$$$$| $$| $$  | $$| $$ \  $$|  $$$$$$$|  $$$$$$$
-|________/ \_______/ \_______/   \___/  |________/|__/|__/  |__/|__/  \__/ \_______/ \_______/
-                                                                                              
-Based off of https://github.com/m8r0wn/CrossLinked
-Modified by Ronnie Bartwitz and @Horshark on Github
-""")
 
 if __name__ == '__main__':
     VERSION = "1.0"
+
     args = argparse.ArgumentParser(description="", formatter_class=argparse.RawTextHelpFormatter, usage=argparse.SUPPRESS)
+
     args.add_argument('-t', dest='timeout', type=int, default=25,help='Timeout [seconds] for search threads (Default: 25)')
     args.add_argument('-j', dest='jitter', type=float, default=0,help='Jitter for scraping evasion (Default: 0)')
     args.add_argument('-s', "--safe", dest="safe", action='store_true',help="Only parse names with company in title (Reduces false positives)")
     args.add_argument('-e', "--email-domain", required=True, dest="email_domain", help="Include the email domain for email-generation (Example: microsoft.com) ")
     args.add_argument('-p', "--hibp", type=str, required=False, dest="hibp", default="", help="Runs all of the emails through HaveIBeenPwned's API and will list pwned accounts, API key is a required argument.")
     args.add_argument('-f', "--email-format", dest="email_format", required=True,type=int,default=1, help="Generates emails based on various formats, 1=jsmith 2=johnsmith 3=johns 4=smithj 5=john.smith 6=smith.john 7=smith")
+    
     args.add_argument(dest='company_name', nargs='+', help='Target company name')
+
     args = args.parse_args()
     safe = args.safe
     debug = False
     args.company_name = args.company_name[0]
+
     try:
         main(args)
     except KeyboardInterrupt:

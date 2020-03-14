@@ -26,7 +26,7 @@ python3 leetlinked.py microsoft -e microsoft.com -f 1
 |________/ \_______/ \_______/   \___/  |________/|__/|__/  |__/|__/  \__/ \_______/ \_______/
 
 Based off of https://github.com/m8r0wn/CrossLinked
-Modified by Ronnie Bartwitz
+Modified by Ronnie Bartwitz and @Horshark on Github
 
 Email format jsmith@company.xyz chosen
 
