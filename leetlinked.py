@@ -400,7 +400,7 @@ if __name__ == '__main__':
     args.add_argument('-s', "--safe", dest="safe", action='store_true',help="Only parse names with company in title (Reduces false positives)")
     args.add_argument('-e', "--email-domain", required=True, dest="email_domain", help="Include the email domain for email-generation (Example: microsoft.com) ")
     args.add_argument('-p', "--hibp", type=str, required=False, dest="hibp", default="", help="Runs all of the emails through HaveIBeenPwned's API and will list pwned accounts, API key is a required argument.")
-    args.add_argument('-f', "--email-format", dest="email_format", required=True,type=int,default=1, help="Generates emails based on various formats, 1=jsmith 2=johnsmith 3=johns 4=smithj 5=john.smith 6=smith.john 7=smith")
+    args.add_argument('-f', "--email-format", dest="email_format", required=True,type=int,default=1, help="Generates emails based on various formats, 1=jsmith 2=johnsmith 3=johns 4=smithj 5=john.smith 6=smith.john 7=smith, 8=john 9=john_smith 10=smith_john 11=js")
     
     args.add_argument(dest='company_name', nargs='+', help='Target company name')
 
