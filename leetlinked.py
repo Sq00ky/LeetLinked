@@ -175,6 +175,16 @@ def main(args):
         print("Email format john.smith@company.xyz chosen")
     elif args.email_format == 6:
         print("Email format smith.john@company.xyz chosen")
+    elif args.email_format == 7:
+        print("Email format smith@company.xyz chosen")
+    elif args.email_format == 8:
+        print("Email format john@company.xyz chosen")
+    elif args.email_format == 9:
+        print("Email format john_smith@company.xyz chosen")
+    elif args.email_format == 10:
+        print("Email format smith_john@company.xyz chosen")
+    elif args.email_format == 11:
+        print("Email format js@company.xyz chosen")
 
     # Sheet's variables.
     q = 1
@@ -271,7 +281,18 @@ def main(args):
                 elif args.email_format == 7:
                     email = lname+"@"+args.email_domain
                     #smith
-
+                elif args.email_format == 8:
+                    email = fname+"@"+args.email_domain
+                    #john
+                elif args.email_format == 9:
+                    email = fname+"_"+lname+"@"+args.email_domain
+                    #john_smith
+                elif args.email_format == 10:
+                    email = lname+"_"+fname+"@"+args.email_domain
+                    #smith_john
+                elif args.email_format == 11:
+                    email = lname[0]+fname[0]+"@"+args.email_domain
+                 
                 # Writes the person's info.
                 ws.write(q, col_fname, fname)
                 ws.write(q, col_lname, lname)
