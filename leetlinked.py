@@ -7,13 +7,23 @@ from time import sleep
 from random import choice
 from threading import Thread
 from bs4 import BeautifulSoup
-
+import os
 requests.packages.urllib3.disable_warnings()
 USER_AGENTS = [line.strip() for line in open('user_agents.txt')]
 
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 # Printing the banner.
 def banner():
-    print("""
+    print(bcolors.BOLD + """
 
  /$$                             /$$     /$$       /$$           /$$                       /$$
 | $$                            | $$    | $$      |__/          | $$                      | $$
@@ -24,9 +34,7 @@ def banner():
 | $$$$$$$$|  $$$$$$$|  $$$$$$$  |  $$$$/| $$$$$$$$| $$| $$  | $$| $$ \  $$|  $$$$$$$|  $$$$$$$
 |________/ \_______/ \_______/   \___/  |________/|__/|__/  |__/|__/  \__/ \_______/ \_______/
                                                                                               
-Based off of https://github.com/m8r0wn/CrossLinked
-Modified by Ronnie Bartwitz and @Horshark on Github
-""")
+""" + bcolors.OKGREEN + "Based off of https://github.com/m8r0wn/CrossLinked\n" + bcolors.OKBLUE + "Modified by Ronnie Bartwitz and @Horshark on Github")
 
 
 # ScrapeEngine for google and bing.
@@ -164,27 +172,27 @@ def main(args):
 
     # Sets the email format.
     if args.email_format == 1:
-        print("Email format jsmith@company.xyz chosen")
+        print(bcolors.HEADER + "Email format jsmith@company.xyz chosen\n")
     elif args.email_format == 2:
-        print("Email format johnsmith@company.xyz chosen")
+        print(bcolors.HEADER + "Email format johnsmith@company.xyz chosen\n")
     elif args.email_format == 3:
-        print("Email format johns@company.xyz chosen")
+        print(bcolors.HEADER + "Email format johns@company.xyz chosen\n")
     elif args.email_format == 4:
-        print("Email format smithj@company.xyz chosen")
+        print(bcolors.HEADER + "Email format smithj@company.xyz chosen\n")
     elif args.email_format == 5:
-        print("Email format john.smith@company.xyz chosen")
+        print(bcolors.HEADER + "Email format john.smith@company.xyz chosen\n")
     elif args.email_format == 6:
-        print("Email format smith.john@company.xyz chosen")
+        print(bcolors.HEADER + "Email format smith.john@company.xyz chosen\n")
     elif args.email_format == 7:
-        print("Email format smith@company.xyz chosen")
+        print(bcolors.HEADER + "Email format smith@company.xyz chosen\n")
     elif args.email_format == 8:
-        print("Email format john@company.xyz chosen")
+        print(bcolors.HEADER + "Email format john@company.xyz chosen\n")
     elif args.email_format == 9:
-        print("Email format john_smith@company.xyz chosen")
+        print(bcolors.HEADER + "Email format john_smith@company.xyz chosen\n")
     elif args.email_format == 10:
-        print("Email format smith_john@company.xyz chosen")
+        print(bcolors.HEADER + "Email format smith_john@company.xyz chosen\n")
     elif args.email_format == 11:
-        print("Email format js@company.xyz chosen")
+        print(bcolors.HEADER + "Email format js@company.xyz chosen\n")
 
     # Sheet's variables.
     q = 1
@@ -252,7 +260,6 @@ def main(args):
             for breach in response_json:
                 if "Passwords" in breach["DataClasses"]:
                     breaches_pass.append(breach["Name"])
-
             # For each person..
             for name, data in lkin.items():
                 # Get his names, job and email.
@@ -323,13 +330,14 @@ def main(args):
                     response_code = response.status_code
 
                     # Prints the result to each email.
-                    print(response_code,email)
-
+                    if response_code == 200:
+                        print(bcolors.FAIL + "Found in Breach - " + hibp_email)
+                    else:
+                        print(bcolors.OKBLUE + "Not found - " + hibp_email)
                     # If the response is positive..
                     if response_code == 200:
                         # Writes pwned col to yes.
                         ws.write(q, col_pwned, "Y")
-
                         response_json = json.loads(response.content)
 
                         breaches_string = ""
@@ -388,7 +396,8 @@ def main(args):
 
         # Write to the actual file.
         wb.save(compname)
-    print("Scrape Complete!")
+    currentdir = os.getcwd()
+    print("Scrape Complete! Results saved to " + currentdir + "/" + compname)
 
 if __name__ == '__main__':
     VERSION = "1.0"
