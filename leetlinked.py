@@ -34,7 +34,7 @@ def banner():
 | $$$$$$$$|  $$$$$$$|  $$$$$$$  |  $$$$/| $$$$$$$$| $$| $$  | $$| $$ \  $$|  $$$$$$$|  $$$$$$$
 |________/ \_______/ \_______/   \___/  |________/|__/|__/  |__/|__/  \__/ \_______/ \_______/
                                                                                               
-""" + bcolors.OKGREEN + "Based off of https://github.com/m8r0wn/CrossLinked\n" + bcolors.OKBLUE + "Modified by Ronnie Bartwitz and @Horshark on Github")
+""" + bcolors.OKGREEN + "Based off of https://github.com/m8r0wn/CrossLinked\n" + bcolors.OKBLUE + "@Sq00ky and @Horshark on Github")
 
 
 # ScrapeEngine for google and bing.
